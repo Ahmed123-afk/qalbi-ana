@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#180b18">
+  <title>قلبي أنا ❤️</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow: hidden;
+      font-family: Tahoma, Arial, sans-serif;
+      color: #fff;
+      background:
+        radial-gradient(circle at top left, #65113e 0, transparent 42%),
+        radial-gradient(circle at bottom right, #8f1539 0, transparent 38%),
+        linear-gradient(135deg, #100814, #291020, #160a19);
+    }
+
+    .hearts {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .heart {
+      position: absolute;
+      bottom: -60px;
+      color: rgba(255, 91, 151, .45);
+      animation: floatUp linear infinite;
+      user-select: none;
+    }
+
+    @keyframes floatUp {
+      from {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: .8;
+      }
+      to {
+        transform: translateY(-115vh) rotate(35deg);
+        opacity: 0;
+      }
+    }
+
+    .login-card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 410px;
+      padding: 38px 27px;
+      text-align: center;
+      background: rgba(255, 255, 255, .075);
+      border: 1px solid rgba(255, 143, 184, .32);
+      border-radius: 25px;
+      box-shadow: 0 20px 65px rgba(0, 0, 0, .4);
+      backdrop-filter: blur(16px);
+      animation: appear .7s ease;
+    }
+
+    @keyframes appear {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(.97);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .logo {
+      width: 85px;
+      height: 85px;
+      margin: 0 auto 17px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 43px;
+      background: linear-gradient(135deg, #ff4b87, #d71948);
+      box-shadow: 0 0 32px rgba(255, 55, 121, .3);
+      animation: heartbeat 1.8s infinite;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      12% { transform: scale(1.07); }
+      24% { transform: scale(1); }
+      36% { transform: scale(1.04); }
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+      color: #ffb1cf;
+    }
+
+    .subtitle {
+      margin: 0 0 27px;
+      color: #e6cfda;
+      font-size: 14px;
+      line-height: 1.9;
+    }
+
+    .field {
+      text-align: right;
+      margin-bottom: 17px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 9px;
+      font-size: 14px;
+      color: #ffd0e1;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px;
+      border: 1px solid rgba(255, 150, 190, .28);
+      border-radius: 13px;
+      outline: none;
+      color: white;
+      background: rgba(15, 5, 15, .55);
+      font-size: 16px;
+      transition: .25s;
+    }
+
+    input:focus {
+      border-color: #ff5c98;
+      box-shadow: 0 0 0 3px rgba(255, 75, 135, .12);
+    }
+
+    input::placeholder {
+      color: #a996a2;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 5px;
+      padding: 15px;
+      border: 0;
+      border-radius: 13px;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      background: linear-gradient(110deg, #ff4b87, #d71948);
+      box-shadow: 0 8px 25px rgba(215, 25, 72, .25);
+      transition: transform .2s, opacity .2s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+    }
+
+    button:disabled {
+      opacity: .65;
+      cursor: wait;
+      transform: none;
+    }
+
+    #error {
+      display: none;
+      margin-top: 17px;
+      padding: 12px;
+      border: 1px solid rgba(255, 90, 120, .3);
+      border-radius: 10px;
+      color: #ffb3bd;
+      background: rgba(170, 20, 50, .16);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .footer {
+      margin-top: 25px;
+      color: #bca7b4;
+      font-size: 12px;
+    }
+
+    .footer span {
+      color: #ff719f;
+    }
+
+    @media (max-width: 420px) {
+      .login-card {
+        padding: 32px 21px;
+      }
+
+      h1 {
+        font-size: 27px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="hearts" id="hearts"></div>
+
+  <main class="login-card">
+    <div class="logo">❤️</div>
+
+    <h1>قلبي أنا</h1>
+
+    <p class="subtitle">
+      مكانك الخاص مستنيك...
+      <br>
+      اكتب كلمة المرور وافتح عالمك الجميل 💕
+    </p>
+
+    <form id="loginForm">
+      <div class="field">
+        <label for="password">كلمة المرور</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          placeholder="اكتب كلمة المرور الخاصة بيك"
+          autocomplete="current-password"
+          required
+          autofocus
+        >
+      </div>
+
+      <button id="loginButton" type="submit">
+        افتح قلبي ❤️
+      </button>
+
+      <div id="error" role="alert"></div>
+    </form>
+
+    <div class="footer">
+      صُمم بحب <span>♥</span> خصيصًا ليك
+    </div>
+  </main>
+
+  <script>
+    // رابط المستخدم يحتوي على الرمز الخاص به.
+    const token = location.pathname.split("/").filter(Boolean).pop();
+
+    const form = document.getElementById("loginForm");
+    const passwordInput = document.getElementById("password");
+    const loginButton = document.getElementById("loginButton");
+    const errorBox = document.getElementById("error");
+
+    function showError(message) {
+      errorBox.textContent = message;
+      errorBox.style.display = "block";
+    }
+
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      errorBox.style.display = "none";
+
+      if (!token || token === "user-login.html") {
+        showError("الرابط غير صحيح. اطلب الرابط الخاص بيك من الإدارة.");
+        return;
+      }
+
+      const password = passwordInput.value;
+
+      if (!password) {
+        showError("اكتب كلمة المرور الأول ❤️");
+        return;
+      }
+
+      loginButton.disabled = true;
+      loginButton.textContent = "لحظة واحدة... ❤️";
+
+      try {
+        const response = await fetch(
+          "/api/user-login/" + encodeURIComponent(token),
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            credentials: "same-origin",
+            body: JSON.stringify({ password })
+          }
+        );
+
+        const result = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            showError("كلمة المرور مش صحيحة، جرّب تاني.");
+          } else if (response.status === 404) {
+            showError("الرابط غير صالح أو الحساب غير موجود.");
+          } else {
+            showError(result.error || "حصلت مشكلة. جرّب تاني.");
+          }
+
+          passwordInput.select();
+          return;
+        }
+
+        location.replace("/my-page.html");
+      } catch (error) {
+        showError("مش قادرين نتصل بالسيرفر. تأكد إن الموقع شغال.");
+      } finally {
+        loginButton.disabled = false;
+        loginButton.textContent = "افتح قلبي ❤️";
+      }
+    });
+
+    // قلوب متحركة في الخلفية.
+    const heartsContainer = document.getElementById("hearts");
+
+    for (let i = 0; i < 22; i++) {
+      const heart = document.createElement("span");
+      heart.className = "heart";
+      heart.textContent = Math.random() > 0.5 ? "♥" : "♡";
+      heart.style.left = Math.random() * 100 + "%";
+      heart.style.fontSize = (14 + Math.random() * 25) + "px";
+      heart.style.animationDuration = (8 + Math.random() * 12) + "s";
+      heart.style.animationDelay = (-Math.random() * 18) + "s";
+      heartsContainer.appendChild(heart);
+    }
+  </script>
+</body>
+</html>

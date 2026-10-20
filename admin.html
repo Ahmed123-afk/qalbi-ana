@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#180b18">
+<title>لوحة الإدارة | قلبي أنا</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(135deg,#100814,#291020,#160a19);color:#fff;font-family:Tahoma,Arial,sans-serif;min-height:100vh}
+header{padding:22px 5%;background:#170c19;border-bottom:1px solid #71304e;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{margin:0;color:#ff9fc4;font-size:25px}
+h2{font-size:19px;color:#ffb1cf;margin-top:0}
+p{line-height:1.8;color:#d8c5d0}
+button,.button{border:0;border-radius:10px;padding:12px 16px;font-weight:bold;cursor:pointer;color:white;background:linear-gradient(110deg,#ff4b87,#d71948)}
+button:disabled{opacity:.6;cursor:wait}
+.secondary{background:#493044}
+.danger{background:#9e193b}
+main{width:min(1150px,94%);margin:25px auto 50px}
+.panel{background:#ffffff0b;border:1px solid #ffffff18;border-radius:17px;padding:22px;margin-bottom:22px;box-shadow:0 10px 30px #0002}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+label{display:block;margin:14px 0 7px;color:#ffd0e1;font-size:14px}
+input,select,textarea{width:100%;padding:12px;border:1px solid #70435d;border-radius:9px;background:#180d1b;color:#fff;font:inherit;outline:none}
+input:focus,select:focus,textarea:focus{border-color:#ff5c98}
+textarea{min-height:100px;resize:vertical}
+button{margin-top:12px}
+.status{display:none;padding:12px;border-radius:9px;margin:12px 0;line-height:1.7;overflow-wrap:anywhere}
+.status.ok{display:block;background:#17452d;color:#c6ffda}
+.status.err{display:block;background:#541c2c;color:#ffd0d8}
+.account{border:1px solid #ffffff20;background:#140b18;border-radius:13px;padding:15px;margin-top:12px;overflow-wrap:anywhere}
+.account-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.role{font-size:12px;border-radius:20px;padding:5px 9px;background:#572b48;color:#ffc2db}
+.account small{color:#d0bac8}
+.account-actions{display:flex;gap:8px;flex-wrap:wrap}
+.account-actions button{font-size:12px;padding:9px}
+.userlink{display:block;margin-top:12px;color:#ffb1cf;word-break:break-all;font-size:13px}
+.note{font-size:13px;color:#bfa9b9}
+hr{border:0;border-top:1px solid #ffffff17;margin:22px 0}
+@media(max-width:500px){header{align-items:flex-start}h1{font-size:21px}.panel{padding:16px}}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>❤️ لوحة إدارة قلبي أنا</h1>
+    <p style="margin:7px 0 0">إدارة الحسابات والرسائل والمفاجآت والوسائط</p>
+  </div>
+  <button class="secondary" id="logoutBtn" type="button">تسجيل الخروج</button>
+</header>
+
+<main>
+  <div id="globalStatus" class="status" role="status"></div>
+
+  <section class="panel">
+    <h2>👥 إنشاء حساب جديد</h2>
+    <p>تقدر تنشئ حساب مستخدم عادي أو حساب أدمن بصلاحيات الإدارة.</p>
+    <form id="accountForm">
+      <div class="grid">
+        <div>
+          <label for="username">اسم الدخول</label>
+          <input id="username" required maxlength="50" autocomplete="off" placeholder="مثال: ahmed">
+        </div>
+        <div>
+          <label for="displayName">الاسم الظاهر</label>
+          <input id="displayName" required maxlength="100" placeholder="الاسم اللي هيظهر للمستخدم">
+        </div>
+        <div>
+          <label for="newPassword">كلمة المرور</label>
+          <input id="newPassword" type="password" required minlength="8" autocomplete="new-password" placeholder="8 أحرف على الأقل">
+        </div>
+        <div>
+          <label for="role">نوع الحساب</label>
+          <select id="role">
+            <option value="user">مستخدم عادي</option>
+            <option value="admin">أدمن بصلاحيات كاملة</option>
+          </select>
+        </div>
+      </div>
+      <button id="createAccountBtn" type="submit">إنشاء الحساب</button>
+    </form>
+    <div id="accountStatus" class="status" role="status"></div>
+    <p class="note">كل حساب مستخدم عادي بيكون له رابط خاص. حسابات الأدمن تدخل من رابط الإدارة.</p>
+  </section>
+
+  <section class="panel">
+    <div class="account-top">
+      <h2>📋 الحسابات الموجودة</h2>
+      <button type="button" class="secondary" id="refreshBtn">تحديث القائمة</button>
+    </div>
+    <p class="note">تقدر تنسخ رابط المستخدم أو تحذف حسابًا. لا يمكنك حذف حساب الأدمن الذي سجلت الدخول به حاليًا.</p>
+    <div id="accountsList">جاري تحميل الحسابات...</div>
+  </section>
+
+  <section class="panel">
+    <h2>💌 إضافة رسالة لمستخدم</h2>
+    <form id="messageForm">
+      <label for="messageUser">المستخدم المستهدف</label>
+      <select id="messageUser" required></select>
+      <label for="messageText">نص الرسالة</label>
+      <textarea id="messageText" required maxlength="10000" placeholder="اكتب رسالتك هنا..."></textarea>
+      <button type="submit">إضافة الرسالة ❤️</button>
+    </form>
+    <div id="messageStatus" class="status" role="status"></div>
+  </section>
+
+  <section class="panel">
+    <h2>🎁 إضافة مفاجأة</h2>
+    <form id="surpriseForm">
+      <label for="surpriseUser">المستخدم المستهدف</label>
+      <select id="surpriseUser" required></select>
+      <label for="surpriseTitle">عنوان المفاجأة</label>
+      <input id="surpriseTitle" required maxlength="200" placeholder="عنوان المفاجأة">
+      <label for="surpriseBody">محتوى المفاجأة</label>
+      <textarea id="surpriseBody" required maxlength="10000" placeholder="اكتب تفاصيل المفاجأة..."></textarea>
+      <button type="submit">إضافة المفاجأة 🎀</button>
+    </form>
+    <div id="surpriseStatus" class="status" role="status"></div>
+  </section>
+
+  <section class="panel">
+    <h2>🖼️ رفع صورة أو أغنية أو فيديو</h2>
+    <form id="mediaForm">
+      <label for="mediaUser">المستخدم المستهدف</label>
+      <select id="mediaUser" required></select>
+
+      <label for="mediaType">نوع الملف</label>
+      <select id="mediaType" required>
+        <option value="image">صورة</option>
+        <option value="audio">أغنية أو ملف صوتي</option>
+        <option value="video">فيديو</option>
+      </select>
+
+      <label for="mediaTitle">اسم الملف (اختياري)</label>
+      <input id="mediaTitle" maxlength="200" placeholder="مثال: أغنيتنا المفضلة">
+
+      <label for="mediaFile">اختيار الملف من جهازك</label>
+      <input id="mediaFile" type="file" required accept="image/*,audio/*,video/*">
+
+      <p class="note">الحد الأقصى المسموح به من السيرفر الحالي هو 100 ميجابايت للملف الواحد.</p>
+      <button id="uploadBtn" type="submit">رفع الملف</button>
+    </form>
+    <div id="mediaStatus" class="status" role="status"></div>
+  </section>
+
+  <section class="panel">
+    <h2>🔗 روابط مهمة</h2>
+    <p>رابط دخول الإدارة على نفس الجهاز:</p>
+    <button type="button" class="secondary" id="copyAdminLink">نسخ رابط الإدارة</button>
+    <p class="note">الرابط المحلي يعمل على جهازك فقط. للوصول من أجهزة أخرى تحتاج إلى استضافة وإعداد مناسب.</p>
+  </section>
+</main>
+
+<script>
+"use strict";
+
+let accounts = [];
+let currentAdmin = null;
+
+const $ = id => document.getElementById(id);
+
+function showStatus(id, message, ok = false) {
+  const el = $(id);
+  el.textContent = message;
+  el.className = "status " + (ok ? "ok" : "err");
+}
+
+async function api(url, options = {}) {
+  const response = await fetch(url, {
+    credentials: "same-origin",
+    ...options,
+    headers: {
+      ...(options.body instanceof FormData ? {} : {"Content-Type": "application/json"}),
+      ...(options.headers || {})
+    }
+  });
+
+  if (response.status === 401 || response.status === 403) {
+    location.replace("/");
+    throw new Error("انتهت جلسة الإدارة أو ليست لديك صلاحية.");
+  }
+
+  const result = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(result.error || result.message || "حصل خطأ أثناء تنفيذ الطلب.");
+  }
+
+  return result;
+}
+
+async function checkAdmin() {
+  try {
+    const result = await api("/api/me");
+    const user = result.user || result;
+
+    if (!user || user.role !== "admin") {
+      location.replace("/");
+      return false;
+    }
+
+    currentAdmin = user;
+    return true;
+  } catch (error) {
+    if (error.message) showStatus("globalStatus", error.message);
+    return false;
+  }
+}
+
+function addOption(select, value, text) {
+  const option = document.createElement("option");
+  option.value = value;
+  option.textContent = text;
+  select.appendChild(option);
+}
+
+function updateUserSelectors() {
+  const regularUsers = accounts.filter(account => account.role === "user");
+  ["messageUser", "surpriseUser", "mediaUser"].forEach(id => {
+    const select = $(id);
+    select.replaceChildren();
+    addOption(select, "", "اختر المستخدم");
+    regularUsers.forEach(user => {
+      addOption(select, String(user.id), user.display_name || user.displayName || user.username);
+    });
+    select.disabled = regularUsers.length === 0;
+  });
+}
+
+function createAccountCard(user) {
+  const card = document.createElement("div");
+  card.className = "account";
+
+  const top = document.createElement("div");
+  top.className = "account-top";
+
+  const identity = document.createElement("div");
+  const name = document.createElement("strong");
+  name.textContent = user.display_name || user.displayName || user.username;
+  const username = document.createElement("div");
+  username.className = "note";
+  username.textContent = "اسم الدخول: " + user.username;
+  identity.append(name, username);
+
+  const role = document.createElement("span");
+  role.className = "role";
+  role.textContent = user.role === "admin" ? "أدمن" : "مستخدم";
+
+  top.append(identity, role);
+  card.appendChild(top);
+
+  if (user.role === "user" && user.publicToken) {
+    const link = location.origin + "/u/" + encodeURIComponent(user.publicToken);
+    const linkText = document.createElement("span");
+    linkText.className = "userlink";
+    linkText.textContent = link;
+    card.appendChild(linkText);
+
+    const copyButton = document.createElement("button");
+    copyButton.type = "button";
+    copyButton.className = "secondary";
+    copyButton.textContent = "نسخ رابط المستخدم";
+    copyButton.addEventListener("click", () => copyText(link));
+    card.appendChild(copyButton);
+  } else if (user.role === "admin") {
+    const linkText = document.createElement("span");
+    linkText.className = "userlink";
+    linkText.textContent = location.origin + "/admin-login";
+    card.appendChild(linkText);
+  }
+
+  const actions = document.createElement("div");
+  actions.className = "account-actions";
+
+  if (currentAdmin && Number(user.id) !== Number(currentAdmin.id)) {
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "danger";
+    deleteButton.textContent = "حذف الحساب";
+    deleteButton.addEventListener("click", () => deleteAccount(user));
+    actions.appendChild(deleteButton);
+  } else if (currentAdmin && Number(user.id) === Number(currentAdmin.id)) {
+    const own = document.createElement("small");
+    own.textContent = "الحساب الحالي";
+    actions.appendChild(own);
+  }
+
+  card.appendChild(actions);
+  return card;
+}
+
+async function loadAccounts() {
+  $("accountsList").textContent = "جاري تحميل الحسابات...";
+
+  try {
+    const result = await api("/api/admin/users");
+    accounts = Array.isArray(result) ? result : (result.users || []);
+    const list = $("accountsList");
+    list.replaceChildren();
+
+    if (!accounts.length) {
+      list.textContent = "لا توجد حسابات لعرضها.";
+    } else {
+      accounts.forEach(user => list.appendChild(createAccountCard(user)));
+    }
+
+    updateUserSelectors();
+  } catch (error) {
+    $("accountsList").textContent = error.message;
+  }
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    showStatus("globalStatus", "تم نسخ الرابط. ❤️", true);
+  } catch {
+    window.prompt("انسخ الرابط من هنا:", text);
+  }
+}
+
+async function deleteAccount(user) {
+  const name = user.display_name || user.displayName || user.username;
+  if (!confirm("هل أنت متأكد من حذف حساب «" + name + "»؟")) return;
+
+  try {
+    await api("/api/admin/users/" + encodeURIComponent(user.id), {
+      method: "DELETE"
+    });
+    showStatus("globalStatus", "تم حذف الحساب.", true);
+    await loadAccounts();
+  } catch (error) {
+    showStatus("globalStatus", error.message);
+  }
+}
+
+$("accountForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const button = $("createAccountBtn");
+  button.disabled = true;
+
+  try {
+    const result = await api("/api/admin/users", {
+      method: "POST",
+      body: JSON.stringify({
+        username: $("username").value.trim(),
+        displayName: $("displayName").value.trim(),
+        password: $("newPassword").value,
+        role: $("role").value
+      })
+    });
+
+    $("accountForm").reset();
+    showStatus("accountStatus",
+      result.role === "admin" ? "تم إنشاء حساب الأدمن بنجاح." : "تم إنشاء حساب المستخدم بنجاح.",
+      true
+    );
+    await loadAccounts();
+  } catch (error) {
+    showStatus("accountStatus", error.message);
+  } finally {
+    button.disabled = false;
+  }
+});
+
+$("messageForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const userId = $("messageUser").value;
+  if (!userId) {
+    showStatus("messageStatus", "اختار المستخدم الأول.");
+    return;
+  }
+
+  try {
+    await api("/api/admin/messages/" + encodeURIComponent(userId), {
+      method: "POST",
+      body: JSON.stringify({message: $("messageText").value.trim()})
+    });
+    $("messageText").value = "";
+    showStatus("messageStatus", "تمت إضافة الرسالة بنجاح ❤️", true);
+  } catch (error) {
+    showStatus("messageStatus", error.message);
+  }
+});
+
+$("surpriseForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const userId = $("surpriseUser").value;
+  if (!userId) {
+    showStatus("surpriseStatus", "اختار المستخدم الأول.");
+    return;
+  }
+
+  try {
+    await api("/api/admin/surprises/" + encodeURIComponent(userId), {
+      method: "POST",
+      body: JSON.stringify({
+        title: $("surpriseTitle").value.trim(),
+        body: $("surpriseBody").value.trim()
+      })
+    });
+    $("surpriseForm").reset();
+    showStatus("surpriseStatus", "تمت إضافة المفاجأة بنجاح 🎁", true);
+  } catch (error) {
+    showStatus("surpriseStatus", error.message);
+  }
+});
+
+$("mediaType").addEventListener("change", () => {
+  const type = $("mediaType").value;
+  const accept = {
+    image: "image/*",
+    audio: "audio/*",
+    video: "video/*"
+  };
+  $("mediaFile").accept = accept[type] || "";
+  $("mediaFile").value = "";
+});
+
+$("mediaForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const userId = $("mediaUser").value;
+  const type = $("mediaType").value;
+  const file = $("mediaFile").files[0];
+
+  if (!userId) {
+    showStatus("mediaStatus", "اختار المستخدم الأول.");
+    return;
+  }
+
+  if (!file) {
+    showStatus("mediaStatus", "اختار الملف اللي عايز ترفعه.");
+    return;
+  }
+
+  const valid = {
+    image: file.type.startsWith("image/"),
+    audio: file.type.startsWith("audio/"),
+    video: file.type.startsWith("video/")
+  };
+
+  if (!valid[type]) {
+    showStatus("mediaStatus", "نوع الملف لا يتوافق مع النوع المختار.");
+    return;
+  }
+
+  if (file.size > 100 * 1024 * 1024) {
+    showStatus("mediaStatus", "حجم الملف أكبر من الحد الأقصى وهو 100 ميجابايت.");
+    return;
+  }
+
+  const button = $("uploadBtn");
+  button.disabled = true;
+  button.textContent = "جاري رفع الملف...";
+
+  try {
+    const data = new FormData();
+    data.append("file", file);
+    data.append("title", $("mediaTitle").value.trim());
+
+    await api("/api/admin/media/" + encodeURIComponent(type) + "/" + encodeURIComponent(userId), {
+      method: "POST",
+      body: data
+    });
+
+    $("mediaForm").reset();
+    $("mediaFile").accept = "image/*,audio/*,video/*";
+    showStatus("mediaStatus", "تم رفع الملف بنجاح ❤️", true);
+  } catch (error) {
+    showStatus("mediaStatus", error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "رفع الملف";
+  }
+});
+
+$("refreshBtn").addEventListener("click", loadAccounts);
+
+$("copyAdminLink").addEventListener("click", () => {
+  copyText(location.origin + "/admin-login");
+});
+
+$("logoutBtn").addEventListener("click", async () => {
+  $("logoutBtn").disabled = true;
+  try {
+    await fetch("/api/logout", {
+      method: "POST",
+      credentials: "same-origin"
+    });
+  } finally {
+    location.replace("/admin-login");
+  }
+});
+
+(async function init() {
+  const ok = await checkAdmin();
+  if (ok) await loadAccounts();
+})();
+</script>
+</body>
+</html>

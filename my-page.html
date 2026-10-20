@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>قلبي أنا ❤️</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Tahoma, Arial, sans-serif;
+      color: #fff;
+      background:
+        radial-gradient(ellipse at top, #70203e 0%, transparent 55%),
+        linear-gradient(145deg, #160610, #360b22, #10050d);
+    }
+
+    header {
+      padding: 25px 16px;
+      text-align: center;
+      border-bottom: 1px solid #ffffff20;
+      background: #16061070;
+    }
+
+    header h1 {
+      margin: 0;
+      color: #ff9cbd;
+      font-size: clamp(27px, 6vw, 42px);
+    }
+
+    header p { color: #f4c8d9; }
+
+    .container {
+      width: min(1050px, 92%);
+      margin: 28px auto;
+    }
+
+    .welcome, .panel {
+      background: #ffffff0b;
+      border: 1px solid #ffffff20;
+      border-radius: 20px;
+      padding: 22px;
+      margin-bottom: 22px;
+      box-shadow: 0 12px 35px #00000025;
+    }
+
+    .welcome { text-align: center; }
+
+    .welcome h2 {
+      color: #ffabc8;
+      font-size: 27px;
+    }
+
+    h3 {
+      color: #ffabc8;
+      margin-top: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .item {
+      min-width: 0;
+      padding: 15px;
+      border-radius: 16px;
+      background: #ffffff0c;
+      border: 1px solid #ffffff18;
+      overflow-wrap: anywhere;
+    }
+
+    .item img, .item video {
+      width: 100%;
+      max-height: 360px;
+      object-fit: contain;
+      border-radius: 12px;
+      background: #000;
+    }
+
+    .item audio { width: 100%; }
+
+    .item h4 {
+      margin: 10px 0;
+      color: #ffd3e2;
+    }
+
+    .message {
+      white-space: pre-wrap;
+      line-height: 1.9;
+      color: #fff0f5;
+    }
+
+    .empty {
+      color: #d9b9c7;
+      text-align: center;
+      padding: 15px 0;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 20px;
+      background: linear-gradient(120deg, #ff6b9d, #e62e70);
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover { filter: brightness(1.1); }
+
+    .logout {
+      display: block;
+      margin: 25px auto;
+      background: #ffffff12;
+      border: 1px solid #ffffff35;
+    }
+
+    #status {
+      text-align: center;
+      color: #ffd0df;
+      padding: 30px 10px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px 10px;
+      color: #d6a7ba;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>قلبي أنا ❤️</h1>
+    <p>مساحة صغيرة مليانة حب وذكريات جميلة</p>
+  </header>
+
+  <main class="container">
+    <div id="status">بنجهز صفحتك الجميلة... ❤️</div>
+
+    <div id="content" hidden>
+      <section class="welcome">
+        <h2 id="welcomeName">أهلًا بيك ❤️</h2>
+        <p>كل حاجة هنا معمولة مخصوص ليك ✨</p>
+      </section>
+
+      <section class="panel">
+        <h3>💌 رسائل ليك</h3>
+        <div id="messages" class="grid"></div>
+      </section>
+
+      <section class="panel">
+        <h3>🎁 مفاجآتك</h3>
+        <div id="surprises" class="grid"></div>
+      </section>
+
+      <section class="panel">
+        <h3>📸 صورنا وذكرياتنا</h3>
+        <div id="images" class="grid"></div>
+      </section>
+
+      <section class="panel">
+        <h3>🎬 فيديوهات</h3>
+        <div id="videos" class="grid"></div>
+      </section>
+
+      <section class="panel">
+        <h3>🎵 أغاني ليك</h3>
+        <div id="audio" class="grid"></div>
+      </section>
+
+      <button class="logout" id="logoutButton">تسجيل الخروج</button>
+    </div>
+  </main>
+
+  <footer>اتعملت بكل حب ❤️ — قلبي أنا</footer>
+
+  <script>
+    const statusBox = document.getElementById("status");
+    const content = document.getElementById("content");
+
+    function makeEmpty(text) {
+      const p = document.createElement("p");
+      p.className = "empty";
+      p.textContent = text;
+      return p;
+    }
+
+    function makeCard(title) {
+      const card = document.createElement("article");
+      card.className = "item";
+
+      const heading = document.createElement("h4");
+      heading.textContent = title || "من القلب ❤️";
+      card.appendChild(heading);
+
+      return card;
+    }
+
+    async function api(url, options = {}) {
+      const response = await fetch(url, {
+        credentials: "same-origin",
+        ...options,
+        headers: {
+          ...(options.headers || {})
+        }
+      });
+
+      if (response.status === 401) {
+        location.href = "/";
+        throw new Error("سجّل دخولك مرة تانية.");
+      }
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.error || "حصلت مشكلة في تحميل البيانات.");
+      }
+
+      return data;
+    }
+
+    function renderMessages(items) {
+      const box = document.getElementById("messages");
+
+      if (!items.length) {
+        box.appendChild(makeEmpty("لسه مفيش رسائل، استنى رسالة حلوة ❤️"));
+        return;
+      }
+
+      items.forEach(item => {
+        const card = makeCard("رسالة من القلب 💌");
+        const text = document.createElement("p");
+        text.className = "message";
+        text.textContent = item.message || "";
+        card.appendChild(text);
+        box.appendChild(card);
+      });
+    }
+
+    function renderSurprises(items) {
+      const box = document.getElementById("surprises");
+
+      if (!items.length) {
+        box.appendChild(makeEmpty("المفاجآت الحلوة لسه جاية 🎁"));
+        return;
+      }
+
+      items.forEach(item => {
+        const card = makeCard(item.title || "مفاجأة ليك ❤️");
+        const text = document.createElement("p");
+        text.className = "message";
+        text.textContent = item.body || "";
+        card.appendChild(text);
+        box.appendChild(card);
+      });
+    }
+
+    function renderMedia(items) {
+      const boxes = {
+        image: document.getElementById("images"),
+        video: document.getElementById("videos"),
+        audio: document.getElementById("audio")
+      };
+
+      const emptyText = {
+        image: "الصور هتظهر هنا ❤️",
+        video: "الفيديوهات هتظهر هنا 🎬",
+        audio: "الأغاني هتظهر هنا 🎵"
+      };
+
+      for (const type of Object.keys(boxes)) {
+        const filtered = items.filter(item => item.type === type);
+
+        if (!filtered.length) {
+          boxes[type].appendChild(makeEmpty(emptyText[type]));
+          continue;
+        }
+
+        filtered.forEach(item => {
+          const card = makeCard(item.title || "ذكرى جميلة");
+          const url = "/api/media/" + encodeURIComponent(item.id);
+          let media;
+
+          if (type === "image") {
+            media = document.createElement("img");
+            media.alt = item.title || "صورة";
+            media.loading = "lazy";
+          } else if (type === "video") {
+            media = document.createElement("video");
+            media.controls = true;
+            media.playsInline = true;
+          } else {
+            media = document.createElement("audio");
+            media.controls = true;
+            media.preload = "metadata";
+          }
+
+          media.src = url;
+          card.appendChild(media);
+          boxes[type].appendChild(card);
+        });
+      }
+    }
+
+    async function loadPage() {
+      try {
+        const data = await api("/api/my-page");
+
+        document.getElementById("welcomeName").textContent =
+          "أهلًا يا " + (data.user.displayName || data.user.username) + " ❤️";
+
+        renderMessages(data.messages || []);
+        renderSurprises(data.surprises || []);
+        renderMedia(data.media || []);
+
+        statusBox.hidden = true;
+        content.hidden = false;
+      } catch (error) {
+        statusBox.textContent = error.message || "تعذر تحميل الصفحة. تأكد إن السيرفر شغال.";
+      }
+    }
+
+    document.getElementById("logoutButton").addEventListener("click", async () => {
+      try {
+        await api("/api/logout", { method: "POST" });
+        location.href = "/";
+      } catch (error) {
+        statusBox.hidden = false;
+        statusBox.textContent = error.message;
+      }
+    });
+
+    loadPage();
+  </script>
+</body>
+</html>
