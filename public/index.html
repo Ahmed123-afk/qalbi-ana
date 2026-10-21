@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#180b18">
+  <title>دخول الإدارة | قلبي أنا</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow: hidden;
+      font-family: Tahoma, Arial, sans-serif;
+      color: #fff;
+      background:
+        radial-gradient(circle at top left, #65113e 0, transparent 42%),
+        radial-gradient(circle at bottom right, #8f1539 0, transparent 38%),
+        linear-gradient(135deg, #100814, #291020, #160a19);
+    }
+
+    #hearts {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .heart {
+      position: absolute;
+      bottom: -50px;
+      color: rgba(255, 91, 151, .4);
+      animation: floatUp linear infinite;
+    }
+
+    @keyframes floatUp {
+      from { transform: translateY(0) rotate(0); opacity: 0; }
+      10% { opacity: .8; }
+      to { transform: translateY(-115vh) rotate(35deg); opacity: 0; }
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 420px;
+      padding: 36px 28px;
+      text-align: center;
+      background: rgba(255, 255, 255, .075);
+      border: 1px solid rgba(255, 143, 184, .32);
+      border-radius: 25px;
+      box-shadow: 0 20px 65px rgba(0, 0, 0, .4);
+      backdrop-filter: blur(16px);
+      animation: appear .7s ease;
+    }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(20px) scale(.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .logo {
+      width: 82px;
+      height: 82px;
+      margin: 0 auto 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 40px;
+      background: linear-gradient(135deg, #ff4b87, #d71948);
+      box-shadow: 0 0 32px rgba(255, 55, 121, .3);
+    }
+
+    h1 {
+      margin: 0 0 9px;
+      font-size: 29px;
+      color: #ffb1cf;
+    }
+
+    .subtitle {
+      margin: 0 0 27px;
+      color: #e6cfda;
+      font-size: 14px;
+      line-height: 1.9;
+    }
+
+    .field {
+      margin-bottom: 17px;
+      text-align: right;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 9px;
+      color: #ffd0e1;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid rgba(255, 150, 190, .28);
+      border-radius: 12px;
+      outline: none;
+      color: white;
+      background: rgba(15, 5, 15, .55);
+      font-size: 16px;
+    }
+
+    input:focus {
+      border-color: #ff5c98;
+      box-shadow: 0 0 0 3px rgba(255, 75, 135, .12);
+    }
+
+    input::placeholder { color: #a996a2; }
+
+    button {
+      width: 100%;
+      margin-top: 5px;
+      padding: 15px;
+      border: 0;
+      border-radius: 12px;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      background: linear-gradient(110deg, #ff4b87, #d71948);
+      transition: transform .2s, opacity .2s;
+    }
+
+    button:hover { transform: translateY(-2px); }
+    button:disabled { opacity: .65; cursor: wait; transform: none; }
+
+    #error {
+      display: none;
+      margin-top: 16px;
+      padding: 12px;
+      border: 1px solid rgba(255, 90, 120, .3);
+      border-radius: 10px;
+      color: #ffb3bd;
+      background: rgba(170, 20, 50, .16);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .footer {
+      margin-top: 25px;
+      color: #bca7b4;
+      font-size: 12px;
+    }
+
+    .footer span { color: #ff719f; }
+
+    @media (max-width: 420px) {
+      .card { padding: 30px 21px; }
+      h1 { font-size: 26px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="hearts"></div>
+
+  <main class="card">
+    <div class="logo">🔐</div>
+    <h1>لوحة إدارة قلبي أنا</h1>
+
+    <p class="subtitle">
+      أهلاً بيك في لوحة الإدارة
+      <br>
+      سجّل دخولك لإدارة الحسابات والمحتوى ❤️
+    </p>
+
+    <form id="loginForm">
+      <div class="field">
+        <label for="username">اسم الأدمن</label>
+        <input
+          id="username"
+          name="username"
+          type="text"
+          placeholder="اكتب اسم الأدمن"
+          autocomplete="username"
+          required
+          autofocus
+        >
+      </div>
+
+      <div class="field">
+        <label for="password">كلمة المرور</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          placeholder="اكتب كلمة المرور"
+          autocomplete="current-password"
+          required
+        >
+      </div>
+
+      <button id="loginButton" type="submit">دخول الإدارة ❤️</button>
+      <div id="error" role="alert"></div>
+    </form>
+
+    <div class="footer">إدارة آمنة <span>♥</span> قلبي أنا</div>
+  </main>
+
+  <script>
+    const form = document.getElementById("loginForm");
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
+    const loginButton = document.getElementById("loginButton");
+    const errorBox = document.getElementById("error");
+
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      errorBox.style.display = "none";
+      loginButton.disabled = true;
+      loginButton.textContent = "جاري تسجيل الدخول...";
+
+      try {
+        const response = await fetch("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify({
+            username: usernameInput.value.trim(),
+            password: passwordInput.value
+          })
+        });
+
+        const result = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          errorBox.textContent =
+            response.status === 401
+              ? "اسم الأدمن أو كلمة المرور غير صحيحة."
+              : (result.error || "تعذر تسجيل الدخول. حاول مرة أخرى.");
+          errorBox.style.display = "block";
+          passwordInput.select();
+          return;
+        }
+
+        if (result.user && result.user.role !== "admin") {
+          errorBox.textContent = "هذا الرابط مخصص للأدمن فقط.";
+          errorBox.style.display = "block";
+          return;
+        }
+
+        location.replace("/admin.html");
+      } catch (error) {
+        errorBox.textContent =
+          "مش قادرين نتصل بالسيرفر. تأكد إن السيرفر شغال.";
+        errorBox.style.display = "block";
+      } finally {
+        loginButton.disabled = false;
+        loginButton.textContent = "دخول الإدارة ❤️";
+      }
+    });
+
+    const hearts = document.getElementById("hearts");
+
+    for (let i = 0; i < 20; i++) {
+      const heart = document.createElement("span");
+      heart.className = "heart";
+      heart.textContent = Math.random() > .5 ? "♥" : "♡";
+      heart.style.left = Math.random() * 100 + "%";
+      heart.style.fontSize = (14 + Math.random() * 24) + "px";
+      heart.style.animationDuration = (8 + Math.random() * 12) + "s";
+      heart.style.animationDelay = (-Math.random() * 18) + "s";
+      hearts.appendChild(heart);
+    }
+  </script>
+</body>
+</html>
